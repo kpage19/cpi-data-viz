@@ -93,6 +93,7 @@ class StateList extends React.Component {
         }
         const height = window.innerWidth >= 850 ? 0.75 * window.innerHeight : 0.45 * window.innerHeight
         const width = window.innerWidth >= 850 ? 0.95 * (window.innerWidth - 200) : 0.9 * window.innerWidth
+
         return(
             <div id="StateList">
                 <div id="list">
@@ -122,7 +123,7 @@ class StateList extends React.Component {
                             {lineList}
 
                         </LineChart>
-                        <p id="cite">{"Data obtained from Hazell, J., J. Herreno, E. Nakamura, and J. Steinsson (2020): \“The Slope of the Phillips Curve: Evidence from U.S. States”"}</p>
+                        <p id="cite">Data obtained from Hazell, J., J. Herre&#241;o, E. Nakamura, and J. Steinsson (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. Inflation rates for the CPI excluding shelter for the period 1978-2017.</p>
                 </div>
             </div>
         );

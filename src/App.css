@@ -62,6 +62,7 @@
 
   #cite {
     display: flex;
+    flex-direction: row;
     align-items: center;
     position: relative;
     margin-left: 45px;
@@ -77,11 +78,11 @@
     float: left;
     width: 100%;
     height: 100%;
-    margin-top: 20px;
   }
 
   #cite {
     display: flex;
+    flex-direction: column;
     align-items: center;
     position: relative;
     margin-left: 5px;
