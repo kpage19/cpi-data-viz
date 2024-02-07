@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/cpi-data-viz/static/css/main.1edf3eb7.css",
+    "main.js": "/cpi-data-viz/static/js/main.9cb06a19.js",
+    "static/js/787.4fd1a539.chunk.js": "/cpi-data-viz/static/js/787.4fd1a539.chunk.js",
+    "index.html": "/cpi-data-viz/index.html",
+    "main.1edf3eb7.css.map": "/cpi-data-viz/static/css/main.1edf3eb7.css.map",
+    "main.9cb06a19.js.map": "/cpi-data-viz/static/js/main.9cb06a19.js.map",
+    "787.4fd1a539.chunk.js.map": "/cpi-data-viz/static/js/787.4fd1a539.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1edf3eb7.css",
+    "static/js/main.9cb06a19.js"
+  ]
+}
