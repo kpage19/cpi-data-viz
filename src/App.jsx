@@ -9,7 +9,7 @@ function App() {
 
     async function getRows() {
       let rows = []
-      const response = await fetch('/data/statecpi_beta.csv').then( response => response.text() )
+      const response = await fetch('/cpi-data-viz/data/statecpi_beta.csv').then( response => response.text() )
       .then( responseText => {
           rows = Papa.parse(responseText);
       });
