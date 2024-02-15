@@ -5,7 +5,7 @@ const CustomToolTip = (props: any) => {
         return null
     }
     const fields = props.payload[0].payload
-    let tooltip = [<div id='tooltip'>{props?.payload[0]?.payload.name}</div>]
+    let tooltip = [<div id='tooltip' key="tooltip">{props?.payload[0]?.payload.name}</div>]
     const keyList = Object.keys(fields).sort()
 
     for(let i = 0; i < keyList.length;  i++) {

@@ -16,6 +16,7 @@ class StateList extends React.Component {
             isChecked: new Array(34).fill(false),
             checkOrder: [],
             data: [],
+            states: [],
             rows: xaxis,
             min: 0,
             max: 5,
@@ -144,7 +145,28 @@ class StateList extends React.Component {
         let lineList = []
         for(let i = 0; i < this.state.data.length; i++) {
             const index = states[this.state.checkOrder[i]]
-            lineList.push(<Line type="monotone" dataKey={index} strokeWidth="3" stroke={colors[i]} dot={false}/>)
+            lineList.push(<Line type="monotone" dataKey={index} strokeWidth="3" stroke={colors[i]} dot={false} key={index}/>)
+        }
+        let height = 0
+        if(window.innerWidth >= 850 && window.innerWidth < 1700){
+            height = 0.75 * window.innerHeight;
+        }
+        else if(window.innerWidth >= 1700) {
+            height = 750
+        }
+        else {
+            height = 0.45 * window.innerHeight
+        }
+
+        let width = 0
+        if(window.innerWidth >= 850 && window.innerWidth < 1700) {
+            width = 0.95 * (window.innerWidth - 200)
+        }
+        else if( window.innerWidth >= 1700) {
+            width = 1300
+        }
+        else {
+            width = 0.9 * window.innerWidth
         }
         let height = getHeight()
         let width = getWidth()
@@ -184,7 +206,8 @@ class StateList extends React.Component {
                             />
                             <YAxis dataKey={this.state.data[0]}
                             domain={[this.state.min, this.state.max]}
-                            style={{fontSize:'10px'}}/>
+                            style={{fontSize:'10px'}}
+                            label={{ value: 'Percent Change From Year Ago, Percent', angle: -90, position: 'insideStart' }}/>
                             <Tooltip content={<CustomToolTip data={this}/>} itemStyle={{fontSize: '15px'}}/>
                             <Legend />
                             {lineList}

@@ -18,7 +18,9 @@
     "csv-string": "^4.1.1",
     "highcharts": "^11.3.0",
     "highcharts-react-official": "^3.2.1",
+    "nth-check": "^2.1.1",
     "papaparse": "^5.4.1",
+    "postcss": "^8.4.35",
     "react": "^18.2.0",
     "react-art": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -31,6 +33,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
