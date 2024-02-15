@@ -2,8 +2,6 @@
 
 This project aims to make it easier to visualize trends in the quarterly state inflation rate by graphing inflation data obtained from Hazell, J., J. Herreno, E. Nakamura, and J. Steinsson (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. 
 
-At this time, only the annual inflation rate in the state and year (pi) can be graphed, but the inflation rate for the non-tradeable and tradeable sector will be added next. 
-
 Works for both web and mobile.
 
 ## Getting Started with Create React App

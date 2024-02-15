@@ -4,7 +4,7 @@ import { Box, FormControlLabel, FormLabel, RadioGroup } from "@mui/material";
 import FormControl from '@mui/material/FormControl';
 import Radio from '@mui/material/Radio';
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { generateDefaultXAxis, formatData, getStatesList, mergeData, piRange, getHeight, getWidth } from "./utils/utils";
+import { generateDefaultXAxis, formatData, getStatesList, mergeData, piRange, getHeight, getWidth, createCSV, toCSV, getSeries } from "./utils/utils";
 import { colors } from "./utils/ColorList";
 import CustomToolTip from "./CustomToolTip";
 
@@ -18,6 +18,7 @@ class StateList extends React.Component {
             data: [],
             states: [],
             rows: xaxis,
+            csv: "",
             min: 0,
             max: 5,
             index: 5
@@ -58,6 +59,14 @@ class StateList extends React.Component {
             for(let i = 0; i < totalData.length; i++) {
                 checkedStatesList.push(this.props.csvData.filter((elem) => elem[0] === totalData[i]))
             }
+            let series = "overall"
+            if(this.state.index === 4) {
+                series = "tradeable"
+            }
+            if(this.state.index === 3) {
+                series = "nontradeable"
+            }
+            const csv = toCSV(checkedStatesList, series, this.state.index)
             formattedData = formatData(checkedStatesList, this.state.index)
 
             if(checkOrder.length !== 0) {
@@ -74,6 +83,7 @@ class StateList extends React.Component {
                 checkOrder: checkOrder,
                 data: totalData,
                 rows: mergedData,
+                csv: csv,
                 min: range[0],
                 max: range[1],
             })
@@ -109,6 +119,7 @@ class StateList extends React.Component {
             for(let i = 0; i < totalData.length; i++) {
                 checkedStatesList.push(this.props.csvData.filter((elem) => elem[0] === totalData[i]))
             }
+            const csv = toCSV(checkedStatesList, position.target.defaultValue, index)
             formattedData = formatData(checkedStatesList, index)
 
             if(checkOrder.length !== 0) {
@@ -125,12 +136,25 @@ class StateList extends React.Component {
                 checkOrder: checkOrder,
                 data: totalData,
                 rows: mergedData,
+                csv: csv,
                 states: states,
                 min: range[0],
                 max: range[1],
                 index: index
             })
         }
+
+        const handleDownload = () => {
+            const blob = new Blob([this.state.csv], {type: 'text/csv;charset=utf-8,' })
+            const url = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.setAttribute('href', url)
+            const fileName = 'state_cpi_' + getSeries(this.state.index) + '.csv'
+            link.setAttribute('download', fileName)
+            document.body.appendChild(link)
+            link.click()
+        }
+
         let listStates = [];
         for(let i = 0; i < states.length; i++) {
             listStates.push(<Box id="checkboxList" key={states[i]}>
@@ -145,52 +169,38 @@ class StateList extends React.Component {
         let lineList = []
         for(let i = 0; i < this.state.data.length; i++) {
             const index = states[this.state.checkOrder[i]]
-            lineList.push(<Line type="monotone" dataKey={index} strokeWidth="3" stroke={colors[i]} dot={false} key={index}/>)
-        }
-        let height = 0
-        if(window.innerWidth >= 850 && window.innerWidth < 1700){
-            height = 0.75 * window.innerHeight;
-        }
-        else if(window.innerWidth >= 1700) {
-            height = 750
-        }
-        else {
-            height = 0.45 * window.innerHeight
-        }
-
-        let width = 0
-        if(window.innerWidth >= 850 && window.innerWidth < 1700) {
-            width = 0.95 * (window.innerWidth - 200)
-        }
-        else if( window.innerWidth >= 1700) {
-            width = 1300
-        }
-        else {
-            width = 0.9 * window.innerWidth
+            lineList.push(<Line key={index} type="monotone" dataKey={index} strokeWidth="3" stroke={colors[i]} dot={false}/>)
         }
         let height = getHeight()
         let width = getWidth()
 
         return(
             <div id="StateList">
+
                 <div id="list">
+                    {this.state.checkOrder.length !== 0 ?  
+                        <div id="button">
+                            <button id="download" onClick={handleDownload}>Download Data</button>
+                        </div> 
+                    : null}
+                
                 <FormControl>
                     <FormLabel id="series">Inflation Series</FormLabel>
-                    <RadioGroup
-                        row
+                    <RadioGroup                         
                         defaultValue={"overall"}
                         onChange={handleChangeSeries}
                     >
-                        <FormControlLabel value="overall" control={<Radio />} label="Overall" />
-                        <FormControlLabel value="tradeable" control={<Radio />} label="Tradeable" />
-                        <FormControlLabel value="nontradeable" control={<Radio />} label="Non-Tradeable" />
+                        <FormControlLabel id="seriesGroup" value="overall" control={<Radio size="small"/>} label="Overall" />
+                        <FormControlLabel id="seriesGroup" value="tradeable" control={<Radio size="small"/>} label="Tradeable Sector" />
+                        <FormControlLabel id="seriesGroup" value="nontradeable" control={<Radio size="small"/>} label="Non-Tradeable Sector" />
                     </RadioGroup>
                 </FormControl>
                     <p id="directions">{"Select up to 5 states to view at a time"}</p>
                     {listStates}
                 </div>
-                <div id="chart">
+                <div id="chart" style={{width: width}}>
                         <LineChart
+                            id="lineChart"
                             width={width}
                             height={height}
                             data={this.state.rows}

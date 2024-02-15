@@ -33,15 +33,8 @@
 
 #checkbox {
   padding: 0px;
-  height: 25px;
+  height: 30px;
   width: 200px;
-}
-
-#chart {
-  margin-top: 20px;
-  margin-left: -10px;
-  margin-right: 5px;
-  position: relative;
 }
 
 #checkboxList {
@@ -62,13 +55,32 @@
 
   #cite {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    /* flex-direction: row; */
+    align-items: left;
+    float: left;
     position: relative;
     margin-left: 45px;
     margin-right: 5px;
   }
 
+  #button {
+    float: left;
+    text-align: left;
+    margin-bottom: 15px;
+  }
+
+  #chart {
+    margin-top: 20px;
+    margin-left: -10px;
+    margin-right: 5px;
+    position: relative;
+  }
+
+  #lineChart {
+    display: flex;
+    align-items: center;
+    float: center;
+  }
 }
 
 @media (max-width: 849px) {
@@ -84,9 +96,32 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
     position: relative;
     margin-left: 5px;
     margin-right: 5px;
+  }
+
+  #button {
+    float: center;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  #chart {
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+    position: relative;
+    align-items: center;
+    align-content: center;
+  }
+
+  #lineChart {
+    display: flex;
+    align-items: center;
+    float: center;
+    /* margin-left: -25px; */
   }
 }
 
@@ -105,4 +140,16 @@
   float: left;
   display: flex;
   text-align: left;
+  color: black;
+}
+
+#seriesGroup {
+  height: 30px;
+}
+
+#download {
+  background-color: white;
+  height: 30px;
+  font-size: 15px;
+  border: 2px solid gray;
 }
