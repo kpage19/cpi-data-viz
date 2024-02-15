@@ -149,3 +149,40 @@ export function getHeight() {
     }
 
 }
+
+export function toCSV(data, series, series_ind) {
+
+    let csvContent = "state,year,quarter," + series + "\n"
+
+    for(let i = 0; i < data.length; i++){
+        for(let j = 0; j < data[i].length; j++) {
+            csvContent += data[i][j][0] + ',' + data[i][j][1] + ',' + data[i][j][2] + ',' + data[i][j][series_ind] + '\n'
+        }
+    }
+    return csvContent
+}
+
+export function createCSV(data, series, series_ind) {
+    const csv = toCSV(data, series, series_ind)
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8,' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'File.csv')
+    link.textContent = 'Click to Download'
+
+    document.querySelector('body').append(link)
+}
+
+export function getSeries(series) {
+    if(series === 3) {
+        return "nontradeable"
+    }
+    else if(series === 4) {
+        return "tradeable"
+    }
+    else {
+        return "overall"
+    }
+}

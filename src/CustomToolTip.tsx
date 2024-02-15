@@ -8,12 +8,12 @@ const CustomToolTip = (props: any) => {
     let tooltip = [<div id='tooltip' key="tooltip">{props?.payload[0]?.payload.name}</div>]
     const keyList = Object.keys(fields).sort()
 
-    for(let i = 0; i < keyList.length;  i++) {
+    for(let i = 0; i < props.payload.length;  i++) {
         if(keyList[i] === "name") {
             continue
         }
         const index = props.data.state.checkOrder[i]
-        const line = props.data.state.states[index] + ": " + fields[props.data.state.states[index]]
+        const line = props.payload[i].name + ": " + props.payload[i].value//props.data.state.states[index] + ": " + fields[props.data.state.states[index]]
         tooltip.push(<div id='tooltip' style={{color:colors[i]}} key={keyList[i]}>{line}</div>)
     }
     return (
