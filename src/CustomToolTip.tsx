@@ -12,8 +12,9 @@ const CustomToolTip = (props: any) => {
         if(keyList[i] === "name") {
             continue
         }
-        const line = keyList[i] + ": " + fields[keyList[i]]
-        tooltip.push(<div id='tooltip' style={{color:colors[i]}}>{line}</div>)
+        const index = props.data.state.checkOrder[i]
+        const line = props.data.state.states[index] + ": " + fields[props.data.state.states[index]]
+        tooltip.push(<div id='tooltip' style={{color:colors[i]}} key={keyList[i]}>{line}</div>)
     }
     return (
         <div id='tooltip'>{tooltip}</div>

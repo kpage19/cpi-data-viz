@@ -41,7 +41,7 @@ export function getInflation(data) {
     return inflation
 }
 
-export function formatData(data) {
+export function formatData(data, series) {
     let formattedData = []
 
     for(let i = 0; i < data.length; i++) {
@@ -50,7 +50,7 @@ export function formatData(data) {
         for(let j = 0; j < data[i].length; j++) {
             stateData.push({
                 name: data[i][j][1] + " Q" + data[i][j][2],
-                [state]: data[i][j][5]
+                [state]: data[i][j][series]
             })
         }
         formattedData.push(stateData)
@@ -123,4 +123,29 @@ export function piRange(data) {
     }
 
     return [Math.min(...mins), Math.max(...max)]
+}
+
+export function getWidth() {
+    if(window.innerWidth >= 850 && window.innerWidth < 1700) {
+        return 0.95 * (window.innerWidth - 200)
+    }
+    else if( window.innerWidth >= 1700) {
+        return 1300
+    }
+    else {
+        return 0.9 * window.innerWidth
+    }
+}
+
+export function getHeight() {
+    if(window.innerWidth >= 850 && window.innerWidth < 1700){
+        return 0.75 * window.innerHeight;
+    }
+    else if(window.innerWidth >= 1700) {
+        return 750
+    }
+    else {
+        return 0.45 * window.innerHeight
+    }
+
 }
