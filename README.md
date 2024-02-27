@@ -3,6 +3,7 @@
 This project aims to make it easier to visualize trends in the quarterly state inflation rate by graphing inflation data obtained from Hazell, J., J. Herreno, E. Nakamura, and J. Steinsson (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. 
 
 Works for both web and mobile.
+Link to site: [https://kpage19.github.io/cpi-data-viz/](https://kpage19.github.io/cpi-data-viz/)
 
 ## Getting Started with Create React App
 
