@@ -223,7 +223,15 @@ class StateList extends React.Component {
                             {lineList}
 
                         </LineChart>
-                        <p id="cite">Data obtained from Hazell, J., J. Herre&#241;o, E. Nakamura, and J. Steinsson (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. Inflation rates for the CPI excluding shelter for the period 1978-2017.</p>
+                        <p id="cite">
+                            {"Data obtained from "}
+                            <a href="https://sites.google.com/view/jadhazell/home">Hazell, J.</a>
+                            {", "} 
+                            <a href="https://sites.google.com/view/juanherreno">J. Herre&#241;o</a>
+                            {", "} 
+                            <a href="https://eml.berkeley.edu/~enakamura/">E. Nakamura</a>
+                            {", and "} 
+                            <a href="https://eml.berkeley.edu/~jsteinsson/">J. Steinsson</a> (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. Inflation rates for the CPI excluding shelter for the period 1978-2017.</p>
                 </div>
             </div>
         );

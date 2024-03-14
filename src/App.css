@@ -54,8 +54,7 @@
   }
 
   #cite {
-    display: flex;
-    /* flex-direction: row; */
+    display: inline;
     align-items: left;
     float: left;
     position: relative;
