@@ -13,7 +13,7 @@ export function getStatesList(data) {
     let list = []
 
     for(let i = 1; i < data.length;i++) {
-        if(!list.includes(data[i][0])){
+        if(!list.includes(data[i][0]) && data[i][0] !== ""){
             list.push(data[i][0])
         }
     }
