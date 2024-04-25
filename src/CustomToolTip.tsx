@@ -5,11 +5,11 @@ const CustomToolTip = (props: any) => {
         return null
     }
     const fields = props.payload[0].payload
-    let tooltip = [<div id='tooltip' key="tooltip">{props?.payload[0]?.payload.name}</div>]
+    let tooltip = [<div id='tooltip' key="tooltip">{props?.payload[0]?.payload.quarter}</div>]
     const keyList = Object.keys(fields).sort()
 
     for(let i = 0; i < props.payload.length;  i++) {
-        if(keyList[i] === "name") {
+        if(keyList[i] === "quarter") {
             continue
         }
         const index = props.data.state.checkOrder[i]

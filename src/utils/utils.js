@@ -1,10 +1,12 @@
+import { END_DATE, MAX_TIME, START_DATE } from "./constants"
+
 export function generateDefaultXAxis() {
-    let date = "1978 Q1"
+    let date = START_DATE
     let list = [date]
 
-    for(let i = 0; i < 160; i++) {
+    for(let i = 0; i < MAX_TIME; i++) {
         date = incDate(date)
-        list.push({name: date})
+        list.push({quarter: date})
     }
     return list
 }
@@ -17,43 +19,40 @@ export function getStatesList(data) {
             list.push(data[i][0])
         }
     }
-
     return list
 }
 
-export function createDate(data) {
-    let dates = []
+export function getNumQs(startY, startQ, endY, endQ) {
+    if(startY === endY) {
+        return (endQ - startQ + 1)
+    }
+    let quarters = 4 * (endY - startY - 1)
+    quarters += (4 - startQ + 1)
+    return quarters + endQ
+}
 
-    for(let i = 0; i < data.length; i++) {
-        const date = data[i][1] + " Q" + data[i][2]
-        dates.push(date)
+export function createDate(data) {
+    let dates = new Array(data.length)
+
+    for(let i = 0; i < dates.length; i++) {
+        dates[i] = data[i][1] + " Q" + data[i][2]
     }
     return dates
 }
 
-export function getInflation(data) {
-    let inflation = []
-
-    for(let i = 0; i < data.length; i++) {
-        inflation.push(data[i][5])
-    }
-    
-    return inflation
-}
-
-export function formatData(data, series) {
-    let formattedData = []
-
+export function formatData(data, series, startY, startQ, endY, endQ) {
+    let formattedData = new Array(data.length)
+    const numQuarters = getNumQs(startY, startQ, endY, endQ)
     for(let i = 0; i < data.length; i++) {
         let stateData = []
         const state = data[i][0][0]
         for(let j = 0; j < data[i].length; j++) {
             stateData.push({
-                name: data[i][j][1] + " Q" + data[i][j][2],
+                quarter: data[i][j][1] + " Q" + data[i][j][2],
                 [state]: data[i][j][series]
             })
         }
-        formattedData.push(stateData)
+        formattedData[i] = stateData
     }
     
     return formattedData
@@ -62,7 +61,9 @@ export function formatData(data, series) {
 export function findMinDate(data) {
     let mins = []
     for(let i = 0; i < data.length; i++){
-        mins.push(data[i][0].name)
+        for(let j = 0; j < data[i].length; j++){
+            mins.push(data[i][j].quarter)
+        }
     }
     mins.sort()
     return mins[0]
@@ -71,8 +72,7 @@ export function findMinDate(data) {
 export function incDate(date) {
     if(date.substring(date.length-1) !== "4") {
         const year = date.substring(0, date.length-1)
-        let quarter = parseInt(date.substring(date.length-1))
-        quarter += 1
+        const quarter = parseInt(date.substring(date.length-1)) +1
         return year + quarter
     }
     else {
@@ -82,22 +82,23 @@ export function incDate(date) {
     }
 }
 
-export function mergeData(data){
+export function mergeData(data, endY, endQ){
     if(data.length === 0) {
         return []
     }
+    const end_date = incDate(endY + " Q" + endQ)
     let mergedData = []
     let date = findMinDate(data)
 
-    while(date !== "2018 Q1") {
+    while(date !== end_date) {
         let point = {
-            name: date
+            quarter: date
         }
 
         for(let i = 0; i < data.length; i++){
-            let state = Object.keys(data[i][0]).filter((elem) => elem !== "name")
+            let state = Object.keys(data[i][0]).filter((elem) => elem !== "quarter")
             state = state[0]
-            let pi = data[i].filter((elem) => elem.name === date)
+            let pi = data[i].filter((elem) => elem.quarter === date)
             if(pi[0] == undefined) {
                 pi = NaN
             }
@@ -121,8 +122,16 @@ export function piRange(data) {
         mins.push(Math.floor(Math.min(...data[i].map((elem) => elem[keys[1]]))))
         max.push(Math.ceil(Math.max(...data[i].map((elem) => elem[keys[1]]))))        
     }
+    let minval = Math.min(...mins)
+    let maxval = Math.max(...max)
 
-    return [Math.min(...mins), Math.max(...max)]
+    if(minval % 2 === 1) {
+        minval -= 1
+    }
+    if(maxval % 2 === 1) {
+        maxval += 1
+    }
+    return [minval, maxval]
 }
 
 export function getWidth() {
@@ -185,4 +194,80 @@ export function getSeries(series) {
     else {
         return "overall"
     }
+}
+
+export function getSeriesIndex(series) {
+    if(series === "nontradeable") {
+        return 3
+    }
+    else if(series === "tradeable") {
+        return 4
+    }
+    return 5
+}
+
+export function getSelected(boolList, states) {
+    let totalData = []
+    for(let i = 0; i < boolList.length; i++) {
+        if(boolList[i] === true) {
+            totalData.push(states[i])
+        }
+
+    }
+    return totalData
+}
+
+export function generateData(selected, csvData, state, index, startY, startQ, endY, endQ) {
+    let dataBundle = {}
+    let statesData = []
+    for(let i = 0; i < selected.length; i++) {
+        statesData.push(csvData.filter((elem) => elem[0] === selected[i] && 
+            ((elem[1] == startY && 
+            elem[2] >= startQ) || 
+            elem[1] > startY) &&
+            ((elem[1] == endY &&
+            elem[2] <= endQ) ||
+            elem[1] < endY)))
+    }
+    
+    const series = getSeries(index)
+    const csv = toCSV(statesData, series, index)
+    const formattedData = formatData(statesData, index, startY, startQ, endY, endQ)
+
+    let mergedData = []
+    let range = []
+    if(selected.length !== 0) {
+        mergedData = mergeData(formattedData, endY, endQ)
+        range = piRange(formattedData)
+    }
+    else{ 
+        mergedData = generateDefaultXAxis()
+        range = [0,2]
+    }
+    let ticks = []
+    for(let i = range[0]; i <= range[1]; i+=2){
+        ticks.push(i)
+    }
+    dataBundle = {
+        data: selected, 
+        csv: csv,
+        formattedData: formattedData,
+        mergedData: mergedData,
+        range: range,
+        ticks: ticks
+    }
+    
+    return dataBundle
+}
+
+export function parseDate(date) {
+    let parsedDate = {}
+    const year = parseInt(date.substring(0,4))
+    const quarter = parseInt(date.substring(date.length - 1))
+    if(isNaN(year)|| isNaN(quarter) || year < 1978 || year > 2017 || quarter < 1 || quarter > 4) {
+        return null
+    }
+    parsedDate.year = year
+    parsedDate.quarter = quarter
+    return parsedDate
 }
