@@ -2,6 +2,7 @@ import React from "react";
 import Papa from "papaparse";
 import './App.css';
 import SeriesGraph from "./SeriesGraph";
+import GraphWrapper from "./GraphWrapper";
 
 function App() {
   const [data, setData] = React.useState([])
@@ -23,7 +24,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h2 id="title">{"State-Level Quarterly Inflation Rates"}</h2>
-        <SeriesGraph className="list" csvData={data} />
+        <GraphWrapper className="list" csvData={data} />
       </header>
     </div>
   );

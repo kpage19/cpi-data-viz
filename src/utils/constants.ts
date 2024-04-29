@@ -9,7 +9,7 @@ export const AUTHORS = [
 ]
 export const CAPTION = [
     "Data obtained from ",
-    " (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. Inflation rates for the CPI excluding shelter for the period 1978-2017."
+    " (2020): “The Slope of the Phillips Curve: Evidence from U.S. States”. Overall series is the inflation rate for the CPI excluding shelter for the period 1978-2017."
 ]
 export const SITES = [
     "https://sites.google.com/view/jadhazell/home",
