@@ -10,10 +10,10 @@ const CustomToolTip = (props: any) => {
 
     for(let i = 0; i < props.payload.length;  i++) {
         if(keyList[i] === "quarter") {
-            continue
+           // continue
         }
         const index = props.data.state.checkOrder[i]
-        const line = props.payload[i].name + ": " + props.payload[i].value//props.data.state.states[index] + ": " + fields[props.data.state.states[index]]
+        const line = props.payload[i].name + ": " + props.payload[i].value
         tooltip.push(<div id='tooltip' style={{color:colors[i]}} key={keyList[i]}>{line}</div>)
     }
     return (

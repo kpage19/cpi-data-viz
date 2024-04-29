@@ -7,15 +7,17 @@ import { Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, X
 import { generateDefaultXAxis, formatData, getStatesList, mergeData, piRange, getHeight, getWidth, createCSV, toCSV, getSeries, getSeriesIndex, getSelected, parseDate, generateData } from "./utils/utils";
 import { colors } from "./utils/ColorList";
 import CustomToolTip from "./CustomToolTip";
+import { AUTHORS, CAPTION, SITES } from "./utils/constants";
 import DateRangePicker from "./DateRangePicker";
 import Citation from "./Citation";
 
-//COMPARING STATES IN A GIVEN SERIES
-class SeriesGraph extends React.Component {
+//COMPARING SERIES FOR A GIVEN STATE
+class StateGraph extends React.Component {
     constructor(props) {
         super(props)
         const xaxis = generateDefaultXAxis()
         this.state = {
+            checkedState: "",
             isChecked: new Array(34).fill(false),
             checkOrder: [],
             data: [],
@@ -25,7 +27,7 @@ class SeriesGraph extends React.Component {
             min: 0,
             max: 4,
             range: [0,2,4],
-            index: [5],
+            index: [3,4,5],
             startYear: 1978,
             startQ: 1,
             endYear: 2017,
@@ -35,55 +37,21 @@ class SeriesGraph extends React.Component {
     render() {
         const states = getStatesList(this.props.csvData)
         const handleChangeStatesList = (position) => {
-            const updateCheckedState = this.state.isChecked.map((item, index) =>
-                index == position ? !item : item
-            )
-
-            const totalData = getSelected(updateCheckedState, states)
+            let updateCheckedState = new Array(states.length).fill(false)
+            updateCheckedState[position] = true
+            const totalData = [states[position]]
             let checkOrder = this.state.checkOrder
-            if(this.state.checkOrder.length === 5 && updateCheckedState[position]) {
-                return null
-            }
-            if(!this.state.isChecked[position]){
-                checkOrder.push(position)
-            }
-            else {
-                checkOrder = checkOrder.filter((elem) => elem !== position)
-            }
-    
             const combinedData = generateData(totalData, this.props.csvData, this.state.index, this.state.startYear, this.state.startQ, this.state.endYear, this.state.endQ)
 
             this.setState({
+                checkedState: states[position],
                 isChecked: updateCheckedState,
                 checkOrder: checkOrder,
                 data: combinedData.data,
-                rows: combinedData.mergedData,
+                rows: combinedData.mergedData[0],
                 csv: combinedData.csv,
                 min: combinedData.range[0],
                 max: combinedData.range[1],
-                range: combinedData.ticks
-            })
-        }
-
-        const handleChangeSeries = (position) => {
-            const updateCheckedState = this.state.isChecked.map((item, index) =>
-                index == position ? !item : item
-            )
-            const index = [getSeriesIndex(position.target.defaultValue)]
-            const totalData = getSelected(updateCheckedState, states)
-            let checkOrder = this.state.checkOrder
-    
-            const combinedData = generateData(totalData, this.props.csvData, index, this.state.startYear, this.state.startQ, this.state.endYear, this.state.endQ)
-
-            this.setState({
-                isChecked: updateCheckedState,
-                checkOrder: checkOrder,
-                data: combinedData.data,
-                rows: combinedData.mergedData,
-                csv: combinedData.csv,
-                min: combinedData.range[0],
-                max: combinedData.range[1],
-                index: index,
                 range: combinedData.ticks
             })
         }
@@ -93,16 +61,20 @@ class SeriesGraph extends React.Component {
             const url = URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.setAttribute('href', url)
-            const fileName = 'state_cpi_' + getSeries(this.state.index[0]) + '.csv'
+            const fileName = 'State CPI ' + this.state.checkedState + '.csv'
             link.setAttribute('download', fileName)
             document.body.appendChild(link)
             link.click()
         }
 
+        const handleChangeToSeries = () => {
+            this.props.onChangetoSeries({graph: "series"})
+        }
+
         const handleStartDate = (data) => {
             this.setState({
                 data: data.data,
-                rows: data.rows,
+                rows: data.rows[0],
                 csv: data.csv,
                 min: data.min,
                 max: data.max,
@@ -114,7 +86,7 @@ class SeriesGraph extends React.Component {
         const handleEndDate = (data) => {
             this.setState({
                 data: data.data,
-                rows: data.rows,
+                rows: data.rows[0],
                 csv: data.csv,
                 min: data.min,
                 max: data.max,
@@ -122,44 +94,40 @@ class SeriesGraph extends React.Component {
                 endQ: data.endQ,
                 range: data.range})
         }
-
-        const handleChangeToState = () => {
-            this.props.onChangeToState({graph: "state"})
-        }
-
         let listStates = [];
         for(let i = 0; i < states.length; i++) {
-            listStates.push(<Box id="checkboxList" key={states[i]}>
+            listStates.push(<RadioGroup id="checkboxList" key={states[i]}>
                 <FormControlLabel id="checkbox"
                         label={states[i]}
-                        control={<Checkbox 
+                        control={<Radio 
                                     checked={this.state.isChecked[i]}
                                     onChange={() =>  handleChangeStatesList(i)}/>}
-                    /></Box>);
+                    /></RadioGroup>);
         }
 
         let lineList = [<ReferenceLine y={0} stroke='black' strokeWidth={2}/>]
-        for(let i = 0; i < this.state.data.length; i++) {
-            const index = states[this.state.checkOrder[i]]
-            lineList.push(<Line key={index} type="linear" dataKey={index} strokeWidth="2" stroke={colors[i]} dot={false}/>)
+        for(let i = 3; i <= 5; i++) {
+            const series = getSeries(i)
+            lineList.push(<Line key={series} type="linear" dataKey={series} strokeWidth="2" stroke={colors[i-3]} dot={false}/>)
         }
         let height = getHeight()
         let width = getWidth()
 
         return(
             <div id="StateList">
+
                 <div id="list">
-                <div id="buttonContainer">
-                    <div id="button">
-                        <button id="changeGraph" onClick={handleChangeToState}>Compare Series</button>
-                    </div>
-                    {this.state.checkOrder.length !== 0 ?  
+                    <div id="buttonContainer">
                         <div id="button">
-                            <button id="download" onClick={handleDownload}>Download Data</button>
-                        </div> 
-                    : null}
-                </div>
-                <DateRangePicker
+                            <button id="changeGraph" onClick={handleChangeToSeries}>Compare States</button>
+                        </div>
+                        {this.state.checkedState !== "" ?  
+                            <div id="button">
+                                <button id="download" onClick={handleDownload}>Download Data</button>
+                            </div> 
+                        : null}
+                    </div>
+                    <DateRangePicker
                         startYear={this.state.startYear}
                         startQ={this.state.startQ}
                         endYear={this.state.endYear}
@@ -170,17 +138,6 @@ class SeriesGraph extends React.Component {
                         onStartDateChange={handleStartDate}
                         onEndDateChange={handleEndDate}
                     />
-                <FormControl>
-                    <FormLabel id="series">Inflation Series</FormLabel>
-                    <RadioGroup                         
-                        defaultValue={"overall"}
-                        onChange={handleChangeSeries}
-                    >
-                        <FormControlLabel id="seriesGroup" value="overall" control={<Radio size="small"/>} label="Overall" />
-                        <FormControlLabel id="seriesGroup" value="tradeable" control={<Radio size="small"/>} label="Tradeable Sector" />
-                        <FormControlLabel id="seriesGroup" value="nontradeable" control={<Radio size="small"/>} label="Non-Tradeable Sector" />
-                    </RadioGroup>
-                </FormControl>
                     <p id="directions">{"Select up to 5 states to view at a time"}</p>
                     {listStates}
                 </div>
@@ -218,4 +175,4 @@ class SeriesGraph extends React.Component {
     }
 }
 
-export default SeriesGraph
+export default StateGraph

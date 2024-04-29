@@ -47,10 +47,21 @@ export function formatData(data, series, startY, startQ, endY, endQ) {
         let stateData = []
         const state = data[i][0][0]
         for(let j = 0; j < data[i].length; j++) {
-            stateData.push({
-                quarter: data[i][j][1] + " Q" + data[i][j][2],
-                [state]: data[i][j][series]
-            })
+            if(series.length === 1) {
+                stateData.push({
+                    quarter: data[i][j][1] + " Q" + data[i][j][2],
+                    [state]: data[i][j][series]
+                })
+            }
+            else {
+                stateData.push({
+                    quarter: data[i][j][1] + " Q" + data[i][j][2],
+                    nontradeable: data[i][j][3],
+                    tradeable: data[i][j][4],
+                    overall: data[i][j][5]
+                })
+            }
+            
         }
         formattedData[i] = stateData
     }
@@ -120,15 +131,21 @@ export function piRange(data) {
     for(let i = 0; i < data.length; i++) {
         const keys = Object.keys(data[i][0])
         mins.push(Math.floor(Math.min(...data[i].map((elem) => elem[keys[1]]))))
-        max.push(Math.ceil(Math.max(...data[i].map((elem) => elem[keys[1]]))))        
+        max.push(Math.ceil(Math.max(...data[i].map((elem) => elem[keys[1]]))))
+        if(keys.length > 2) {
+            mins.push(Math.floor(Math.min(...data[i].map((elem) => elem[keys[2]]))))
+            max.push(Math.ceil(Math.max(...data[i].map((elem) => elem[keys[2]]))))
+            mins.push(Math.floor(Math.min(...data[i].map((elem) => elem[keys[3]]))))
+            max.push(Math.ceil(Math.max(...data[i].map((elem) => elem[keys[3]]))))
+        }        
     }
     let minval = Math.min(...mins)
     let maxval = Math.max(...max)
 
-    if(minval % 2 === 1) {
+    if(minval % 2 !== 0) {
         minval -= 1
     }
-    if(maxval % 2 === 1) {
+    if(maxval % 2 !== 0) {
         maxval += 1
     }
     return [minval, maxval]
@@ -161,27 +178,31 @@ export function getHeight() {
 
 export function toCSV(data, series, series_ind) {
 
-    let csvContent = "state,year,quarter," + series + "\n"
-
-    for(let i = 0; i < data.length; i++){
-        for(let j = 0; j < data[i].length; j++) {
-            csvContent += data[i][j][0] + ',' + data[i][j][1] + ',' + data[i][j][2] + ',' + data[i][j][series_ind] + '\n'
+    let csvContent = "state,year,quarter," 
+    
+    for(let i = 0; i < series.length; i++) {
+        csvContent += series[i]
+        if(i < series.length - 1) {
+            csvContent += ","
         }
     }
+    
+    csvContent += "\n"
+    
+    if(series.length === 1) {
+        for(let i = 0; i < data.length; i++){
+            for(let j = 0; j < data[i].length; j++) {
+                csvContent += data[i][j][0] + ',' + data[i][j][1] + ',' + data[i][j][2] + ',' + data[i][j][series_ind] + '\n'
+            }
+        }
+    }
+    else {
+        for(let i = 0; i < data[0].length; i++) {
+            csvContent += data[0][i][0] + ',' + data[0][i][1] + ',' + data[0][i][2] + ',' + data[0][i][3] + ',' + data[0][i][4] + ',' + data[0][i][5] + '\n'
+        }
+    }
+    
     return csvContent
-}
-
-export function createCSV(data, series, series_ind) {
-    const csv = toCSV(data, series, series_ind)
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8,' })
-    const url = URL.createObjectURL(blob)
-
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', 'File.csv')
-    link.textContent = 'Click to Download'
-
-    document.querySelector('body').append(link)
 }
 
 export function getSeries(series) {
@@ -217,7 +238,7 @@ export function getSelected(boolList, states) {
     return totalData
 }
 
-export function generateData(selected, csvData, state, index, startY, startQ, endY, endQ) {
+export function generateData(selected, csvData, index, startY, startQ, endY, endQ) {
     let dataBundle = {}
     let statesData = []
     for(let i = 0; i < selected.length; i++) {
@@ -230,14 +251,23 @@ export function generateData(selected, csvData, state, index, startY, startQ, en
             elem[1] < endY)))
     }
     
-    const series = getSeries(index)
+    let series = [getSeries(index[0])]
+    if(index.length > 1) {
+        series.push(getSeries(index[1]))
+        series.push(getSeries(index[2]))
+    }
     const csv = toCSV(statesData, series, index)
     const formattedData = formatData(statesData, index, startY, startQ, endY, endQ)
 
     let mergedData = []
     let range = []
     if(selected.length !== 0) {
-        mergedData = mergeData(formattedData, endY, endQ)
+        if(index.length === 1){
+            mergedData = mergeData(formattedData, endY, endQ)
+        }
+        else {
+            mergedData = formattedData
+        }
         range = piRange(formattedData)
     }
     else{ 
